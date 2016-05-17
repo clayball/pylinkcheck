@@ -25,22 +25,32 @@ from datetime import datetime
 import re
 from bs4 import BeautifulSoup
 
-# TODO: add validation checks
-#import validate
+#######################################
+# Functions
 
-def spiderURL(baseurl, ):
-	# 
+# Spider the base URL
+def spiderURL(baseurl, pathlimit):
+	# build a list based on each sub directory found.. this could get a litte hairy
+	print '[spider] path limit set to %d' % pathlimit
 
-def printReport(notfound):
-	# print each item in the notfound list
+
+# Print an informative summary of the dead links
+def printReport(deadlinks):
+	# print each item in the deadlinks list
 	print '\n\n'
 	print '###############################################################################'
 	print ' Link Checker Results'
 	print ' '
-	for item in notfound:
-		print '[-] NOT FOUND: %s' % item
+	if not deadlinks:
+		print '[+] SUCCESS: No dead links found'
+	else:
+		for item in deadlinks:
+			print '[-] NOT FOUND: %s' % item
 
 
+#######################################
+# Main program
+#
 # Get command line options
 parser = argparse.ArgumentParser(description='This is a Python-based link checker.')
 parser.add_argument('-f','--format', help='Output file format ', required=False, default='txt')
@@ -71,11 +81,11 @@ checkurl = urllib2.urlopen(baseurl).read()
 soup = BeautifulSoup(checkurl, 'html.parser')
 
 # Spider the site and build our list of URLs to check
-spiderURL(baseurl)
+spiderURL(baseurl, pathlimit)
 
 # Check the URLs
 
-notfound = []
+deadlinks = []
 
 for link in soup("a"):
 	# only grab the href string
@@ -85,7 +95,7 @@ for link in soup("a"):
 	href = link.get('href')
 
 	# build the full URL if the href is relative
-	if re.match('^http:', href):
+	if re.match('^http', href):
 		checkurl = href
 	else:
 		checkurl = baseurl + href
@@ -97,17 +107,16 @@ for link in soup("a"):
 		if e.code == 404:	
 			print '[-] 404 ERROR: %s' % checkurl
 			# add this URL
-			notfound.append(checkurl)
+			deadlinks.append(checkurl)
 		else:
-			print '[-] HTTP ERROR: Unknown %s' % checkurl
+			print '[-] HTTP ERROR: %d - %s' % (e.code, checkurl)
 	except urllib2.URLError as e:
 		# Not an HTTP-specific error (e.g. connection refused)
-		print '[-] NON-HTTP ERROR: %s' % checkurl
+		print '[-] NON-HTTP ERROR: %d - %s' % (e.code, checkurl)
 	else:
 		print '[+] Status %d for %s' % (hrefpage.getcode(), checkurl)
 
-print(len(notfound))
 
-printReport(notfound)
+printReport(deadlinks)
 
 # EOF
