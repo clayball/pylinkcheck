@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
-# Clay Wells 
-#
+# Copyright (c) 2016 Clay Wells 
 #
 # A Python-based link checker.
 #  
@@ -15,7 +14,7 @@
 #   url root (domain): this is simply required
 #   generate report file: -o output.txt, --output=output.txt
 #   limit depth: -l 2, --limit=2
-#   TODO: report format: --format=txt,md,html,xml
+#   TODO: report format: --format=txt,html,xml
 ##############################################################################
 
 import argparse
@@ -42,7 +41,7 @@ def printReport(deadlinks):
 	print ' Link Checker Results'
 	print ' '
 	if not deadlinks:
-		print '[+] SUCCESS: No dead links found'
+		print '[+] CLEAN: No dead links found'
 	else:
 		for item in deadlinks:
 			print '[-] NOT FOUND: %s' % item
@@ -58,9 +57,6 @@ parser.add_argument('-l','--limit', help='Limit directory depth, example.com/lim
 parser.add_argument('-u','--url', help='Base URL to check', required=True)
 parser.add_argument('-o','--output', help='Output file name', required=False)
 args = parser.parse_args()
- 
-# Validate input
-#validate = Validate()
 
 # Assign args to vars
 baseurl = str(args.url)
@@ -83,10 +79,9 @@ soup = BeautifulSoup(checkurl, 'html.parser')
 # Spider the site and build our list of URLs to check
 spiderURL(baseurl, pathlimit)
 
-# Check the URLs
-
 deadlinks = []
 
+# Check the URLs
 for link in soup("a"):
 	# only grab the href string
 	#print '[+] found link: %s' % link.get('href')
@@ -118,5 +113,4 @@ for link in soup("a"):
 
 
 printReport(deadlinks)
-
 # EOF
