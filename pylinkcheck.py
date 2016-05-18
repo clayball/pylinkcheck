@@ -104,6 +104,7 @@ for link in soup("a"):
 	
 	# Separate the file from the path
 	thisurl = urlparse(href)
+	
 	if thisurl.netloc != baseurl and thisurl.netloc != '':
 		print '[-] HREF %s is out of scope' % thisurl.netloc
 		outofscope = 1
