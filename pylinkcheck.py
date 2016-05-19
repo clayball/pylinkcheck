@@ -39,7 +39,8 @@ def spiderURL(baseurl, pathlimit):
 # Print an informative summary of the dead links
 def printReport(deadlinks):
 	# print each item in the deadlinks list or CLEAN if empty
-	print '\n\n###############################################################################'
+	print '\n\n'
+	print '#' * 79 
 	print ' Link Checker Results\n'
 	if not deadlinks:
 		print '[+] CLEAN: No dead links found'
@@ -99,12 +100,17 @@ for link in soup("a"):
 	# need to get all of this)
 	#if baseurl[:-1] == '/':
 	#	print '[debug] strip last char from baseurl'
+	# mailto: is causing an error
 	href = link.get('href')
 	print '[debug] href: %s' % href
+	if re.match('^mailto', href):
+		# skip this one
+		continue
+	
 	
 	# Separate the file from the path
 	thisurl = urlparse(href)
-	
+
 	if thisurl.netloc != baseurl and thisurl.netloc != '':
 		print '[-] HREF %s is out of scope' % thisurl.netloc
 		outofscope = 1
